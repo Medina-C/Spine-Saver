@@ -134,18 +134,20 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       arduinoData = str;
 
-      switch(arduinoData) {
-        case GOOD_POSTURE:
-          postureState = PostureState.GOOD;
-          changeColor(Colors.green);
-          break;
-        case BAD_POSTURE:
-          postureState = PostureState.BAD;
-          changeColor(Colors.red);
-          break;
-        default:
-          postureState = PostureState.UNSET;
-          changeColor(Colors.blueGrey);
+      if(enabled) {
+        switch (arduinoData) {
+          case GOOD_POSTURE:
+            postureState = PostureState.GOOD;
+            changeColor(Colors.green);
+            break;
+          case BAD_POSTURE:
+            postureState = PostureState.BAD;
+            changeColor(Colors.red);
+            break;
+          default:
+            postureState = PostureState.UNSET;
+            changeColor(Colors.blueGrey);
+        }
       }
     });
   }
