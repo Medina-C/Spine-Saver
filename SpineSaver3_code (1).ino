@@ -1,3 +1,5 @@
+//Program was created by Owen Weiss, Aaron Spoelstra, and Medini Colabrese for Hack the North 2020++
+//Raw data algorithm for MPU 6050 Sensors was retrieved from https://maker.pro/arduino/tutorial/how-to-interface-arduino-and-the-mpu-6050-sensor
 #include <SoftwareSerial.h>
 #include<Wire.h>
 
@@ -11,9 +13,9 @@ int minVal=265;
 int maxVal=402;
 
 int TOLERANCE = 20;
-int highTol = 10;
+int highTol = 20;
 int medTol = 15;
-int lowTol = 20;
+int lowTol = 10;
 
 int timeSeconds = 10;
  
@@ -85,7 +87,7 @@ void smoothRead(int readTime, bool setupRun){
 void readBluetooth(char & btIn)
 {
   char temp = btSerial.read();
-  if(temp >= 65 && temp <= 90)
+  if(temp >= 65 && temp <= 90) //Double checks for valid input from bluetooth (Avoids finicky null chars)
   {
     btIn = temp;
   }
@@ -109,48 +111,37 @@ void loop() {
   switch(btIn) {
   
   case 'C': //calibration
-      Serial.println("Calibration");
       smoothRead(1000, true);
       btSerial.write('C');
       btIn = 0;
       break;
 
-  case 'H':
-      Serial.println("High Tolerance mode");
+  case 'H': // High Tolerance
       TOLERANCE = highTol;
       btIn = 'S';
       break;
 
-  case 'M':
-      Serial.println("Medium Tolerance mode");
+  case 'M': // Medium Tolerance
       TOLERANCE = medTol;
       btIn = 'S';
       break;
 
-  case 'L':
-      Serial.println("Low Tolerance mode");
+  case 'L': // Low Tolerance
       TOLERANCE = lowTol;
       btIn = 'S';
       break;
 
-  case 'S':
-      Serial.println("Started");
-      
+  case 'S': //Starts the regular posture readings
       smoothRead(1000, false);
 
-      Serial.println(abs(smoothX - avX));
-      Serial.println(abs(smoothY - avY));
-      Serial.println(abs(smoothZ - avZ));
-        
-      if (abs(smoothX - avX) > TOLERANCE)
+      //Communicates good or bad posture to the bluetooth serial line
+      if (abs(smoothY - avY) > TOLERANCE)
         { 
-          Serial.println("Bad posture");
           btSerial.write('B');
         }
       else{
         btSerial.write('G');
       }
-
       break;
   }
- }
+}

@@ -12,6 +12,7 @@ class SpineSaver extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    // Uses DynamicTheme to easily change the app's colours
     return new DynamicTheme(
         defaultBrightness: Brightness.light,
         data: (brightness) => new ThemeData(
@@ -42,9 +43,9 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
 
-  static const bool TESTING = false;
+  static const bool TESTING = false;  // Toggles testing mode (to test without arduino connection)
 
-  // Sending
+  // Values to send
   static const String CALIBRATE = 'C';
   static const String HIGH_TOL = 'H';
   static const String MED_TOL = 'M';
@@ -52,16 +53,16 @@ class _MainPageState extends State<MainPage> {
   static const String END = 'E';
   static const String START = 'S';
 
-  // Receiving
+  // Values to be received
   static const String DONE_CALIBRATE = 'C';
   static const String GOOD_POSTURE = 'G';
   static const String BAD_POSTURE = 'B';
 
-  String arduinoData = "";
-  String message = "";
-  String tolerance = 'M';
+  String arduinoData = "";  // The values from the arduino
+  String message = "";      // The message on the screen
+  String tolerance = 'M';   // The current selected tolerance
 
-  PostureState postureState = PostureState.INIT;
+  PostureState postureState = PostureState.INIT;  // The state of the user/program
   bool enabled = true;
 
   Color btnUnselected = Colors.grey;
@@ -76,6 +77,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
 
+    // Uses postureState to set the appropriate message
     switch(postureState) {
       case PostureState.INIT:
         message = "Welcome! Hit the Calibrate button to start!";
@@ -120,7 +122,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  // Sends signal to calibrate
+  // Sends signal to calibrate the device
   void calibrate() {
     setState(() {
       postureState = PostureState.CALIBRATING;
@@ -129,7 +131,7 @@ class _MainPageState extends State<MainPage> {
     BTController.transmit(CALIBRATE);
   }
 
-  // Handles incoming data
+  // Receives incoming data and sets colours accordingly
   void onData(dynamic str) {
     setState(() {
       arduinoData = str;
@@ -152,6 +154,7 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  // Shows buttons only if in testing mode
   List<Widget> actions() {
     return TESTING ? <Widget>[
       IconButton(
@@ -175,6 +178,8 @@ class _MainPageState extends State<MainPage> {
     ] : null;
   }
 
+  // Gets the objects on screen
+  // Some things are hidden if it is in "disabled" mode
   List<Widget> columnChildren() {
     List<Widget> list = [];
 
@@ -323,6 +328,7 @@ class _MainPageState extends State<MainPage> {
     return list;
   }
 
+  // Changes the colour of the app
   void changeColor(MaterialColor newColor) {
     if( Theme.of(context).primaryColor != newColor) {
       DynamicTheme.of(context).setThemeData(new ThemeData(
@@ -330,6 +336,8 @@ class _MainPageState extends State<MainPage> {
       ));
     }
   }
+
+  // Provided in example code - do not touch
 
   Future<void> scanDevices() async {
 
